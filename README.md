@@ -6,6 +6,11 @@ Protocol's 2026-04-17 spec update, ChatGPT-family agents too) can browse a
 cart, start a payment, and confirm it end to end, without a human touching
 any UI at all.
 
+**Deploy:** `https://mcp-ap.autopaylab.com/api/mcp` (open — no
+`MCP_ACCESS_TOKEN` set yet; see "Locking it down" below). Note:
+`mcp.autopaylab.com` was already taken by a different, live project
+(`merchant-mcp`) — this one got `mcp-ap.` instead.
+
 **This is a general Autopay integration, not a Paytalk-specific one.** It
 was originally built inside the [paytalk](https://github.com/autopaylab/paytalk)
 repo as a demo for that project's conversational widget, then extracted
