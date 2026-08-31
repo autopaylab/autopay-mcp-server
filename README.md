@@ -1,34 +1,45 @@
 # Autopay MCP server
 
-Exposes the Paytalk demo checkout as [MCP](https://modelcontextprotocol.io)
+Exposes Autopay's Online v1.1 payment sandbox as [MCP](https://modelcontextprotocol.io)
 tools — any MCP-compatible agent (Claude, and per the Agentic Commerce
-Protocol's 2026-04-17 spec update, ChatGPT-family agents too) can browse the
-cart, start a payment, and confirm it **without a human touching the widget
-UI at all**. A separate, independently deployable project (Root Directory =
-`autopay-mcp-server/`), same pattern as the other two sandboxes in this repo.
+Protocol's 2026-04-17 spec update, ChatGPT-family agents too) can browse a
+cart, start a payment, and confirm it end to end, without a human touching
+any UI at all.
+
+**This is a general Autopay integration, not a Paytalk-specific one.** It
+was originally built inside the [paytalk](https://github.com/autopaylab/paytalk)
+repo as a demo for that project's conversational widget, then extracted
+here once it became clear the payment logic (`initiate_payment`,
+`confirm_payment`) has nothing to do with that widget — it's a thin wrapper
+around Autopay's generic hash-signing + ITN-confirmation flow, and would
+work identically for any merchant. Only `get_cart`'s demo catalog is a
+cosmetic leftover from that origin (see "Tools" below).
 
 ## Why this exists
 
 Wrapping a checkout as a conversational widget UI is easy for any competing
 PSP to copy via their own WhiteLabel integration — the UI isn't the moat.
-Exposing the *same* checkout as MCP tools is a different claim: it says the
-integration is agent-native, not just human-native. Worth being honest about
-scope, though — Adyen, Stripe, and Worldpay already publish payment MCP
-servers, so "we support MCP" alone isn't a unique differentiator among major
-global PSPs. The realistic pitch is being early/best **in Autopay's actual
-competitive set** (regional PSPs), not inventing something nobody else has.
+Exposing checkout as MCP tools is a different claim: it says the
+integration is agent-native, not just human-native. Worth being honest
+about scope, though — Adyen, Stripe, and Worldpay already publish payment
+MCP servers, so "we support MCP" alone isn't a unique differentiator among
+major global PSPs. The realistic pitch is being early/best **in Autopay's
+actual competitive set** (regional PSPs), not inventing something nobody
+else has.
 
 ## Tools
 
 | Tool | What it does |
 | --- | --- |
-| `get_cart` | Returns the demo cart (same items as `Component.DEFAULT_CART` in the widget) — items, quantities, total. |
+| `get_cart` | Returns a demo cart (items, quantities, total) — placeholder catalog, swap for a real one when wiring this up to an actual merchant. |
 | `initiate_payment` | Calls the live Online v1.1 sandbox's `POST /api/initiate` — real hash-signing, not a mock. |
 | `confirm_payment` | Calls `POST /api/simulate-bank` — builds a correctly-signed ITN and verifies it through the same code path a real notification would use. |
 
-All three hit `https://sndbx.autopaylab.com` by default (`autopay-sandbox/`
-in this repo) — the exact same backend the widget's "Sandbox: Online v1.1"
-option talks to. `AUTOPAY_SANDBOX_URL` overrides the target.
+All three hit `https://sndbx.autopaylab.com` by default — the
+[autopay-sandbox](https://github.com/autopaylab/paytalk/tree/main/autopay-sandbox)
+project (lives in the `paytalk` repo), the exact same backend that widget's
+"Sandbox: Online v1.1" option talks to. `AUTOPAY_SANDBOX_URL` overrides the
+target — point it at any Online v1.1-compatible sandbox, Paytalk-related or not.
 
 ## Running locally
 
@@ -53,10 +64,12 @@ npx @modelcontextprotocol/inspector
 
 ## Deploying
 
-Create a **separate** Vercel project pointing at this repo with **Root
-Directory** set to `autopay-mcp-server/`. Framework Preset: "Other", no
-build command. Set `AUTOPAY_SANDBOX_URL` if you want it to drive a
-different sandbox (e.g. the WhiteLabel one) instead of the default.
+This repo deploys as its own Vercel project — Root Directory stays the
+repo root (no subfolder to select, unlike when this lived inside
+`paytalk`). Framework Preset: "Other", no build command. Set
+`AUTOPAY_SANDBOX_URL` if you want it to drive a different sandbox (e.g.
+[autopay-whitelabel-sandbox](https://github.com/autopaylab/paytalk/tree/main/autopay-whitelabel-sandbox))
+instead of the default.
 
 ## Locking it down with a token
 
@@ -86,3 +99,10 @@ money.
   function instances, so there's nothing to keep "alive" between them.
 - Tool input schemas are plain Zod shapes (`{ orderId: z.string(), ... }`) —
   the SDK auto-derives the JSON Schema clients see from these.
+
+## Related repos
+
+- [paytalk](https://github.com/autopaylab/paytalk) — the conversational
+  checkout widget this was originally demoed against, plus the Online v1.1
+  and WhiteLabel sandboxes it can talk to. Independent of this repo; no
+  code or deploy dependency in either direction.

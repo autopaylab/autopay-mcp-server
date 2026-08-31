@@ -42,7 +42,7 @@ module.exports = async (req, res) => {
   if (applyCors(req, res)) return;
   if (!checkAuth(req, res)) return;
 
-  const server = new McpServer({ name: 'paytalk-autopay-checkout', version: '0.1.0' });
+  const server = new McpServer({ name: 'autopay-checkout', version: '0.1.0' });
   registerCheckoutTools(server);
 
   const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });

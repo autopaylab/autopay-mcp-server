@@ -2,7 +2,7 @@
   "name": "autopay-mcp-server",
   "version": "0.1.0",
   "private": true,
-  "description": "MCP server exposing the Paytalk/Autopay sandbox checkout as tools an AI agent can call directly",
+  "description": "MCP server exposing Autopay's Online v1.1 sandbox checkout as tools an AI agent can call directly",
   "scripts": {
     "dev": "node scripts/dev-server.js",
     "test:mcp": "node scripts/test-mcp.js"
