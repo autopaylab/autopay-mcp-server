@@ -4,12 +4,15 @@
 const BASE = `http://localhost:${process.env.PORT || 3002}/api/mcp`;
 
 async function rpc(method, params, id) {
+  const headers = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json, text/event-stream',
+  };
+  if (process.env.MCP_ACCESS_TOKEN) headers.Authorization = 'Bearer ' + process.env.MCP_ACCESS_TOKEN;
+
   const res = await fetch(BASE, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json, text/event-stream',
-    },
+    headers,
     body: JSON.stringify({ jsonrpc: '2.0', id: id ?? 1, method, params }),
   });
   const contentType = res.headers.get('content-type') || '';

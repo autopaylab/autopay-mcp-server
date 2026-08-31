@@ -58,6 +58,25 @@ Directory** set to `autopay-mcp-server/`. Framework Preset: "Other", no
 build command. Set `AUTOPAY_SANDBOX_URL` if you want it to drive a
 different sandbox (e.g. the WhiteLabel one) instead of the default.
 
+## Locking it down with a token
+
+The server is open by default (anyone with the URL can call it — fine for a
+sandbox, not fine once it's doing anything real). To require a password:
+
+1. In the Vercel project → Settings → Environment Variables, add
+   `MCP_ACCESS_TOKEN` with a random secret value.
+2. Every client must now send `Authorization: Bearer <that secret>` or get a
+   401. `AUTOPAY_SANDBOX_URL`-style: unset = open, set = enforced — no code
+   change needed either way.
+3. Configure the MCP client to send it:
+   - **Claude Code**: `claude mcp add --transport http autopay-checkout https://your-mcp-server.vercel.app/api/mcp --header "Authorization: Bearer <secret>"`
+   - **Claude Desktop** (`claude_desktop_config.json`): add a `"headers": { "Authorization": "Bearer <secret>" }` entry alongside the server's `url`.
+   - **Local testing**: `MCP_ACCESS_TOKEN=<secret> npm run test:mcp` (the script picks it up automatically).
+
+This is a shared-secret check, not OAuth — enough to keep a demo/sandbox
+private, not a substitute for real per-user auth if this ever handles real
+money.
+
 ## Implementation notes
 
 - Stateless Streamable HTTP transport (`sessionIdGenerator: undefined`) — a
