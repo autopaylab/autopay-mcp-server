@@ -13,8 +13,11 @@ verify its confirmation end to end, without a human touching any UI. Covers
   before starting the transaction (`payment`) on its own UI.
   Docs: https://autopay.gitbook.io/autopay-sdk/schemat-transakcji-whitelabel
 
-**Deploy:** `https://mcp-ap.autopaylab.com/api/mcp` (open — no
-`MCP_ACCESS_TOKEN` set yet; see "Locking it down" below).
+**Deploy:** `https://mcp-ap.autopaylab.com/api/mcp` (Bearer-token protected —
+see "Locking it down" below for how to get a token).
+
+**Landing page:** https://claude.ai/code/artifact/16135f3d-b5a9-4f54-9d9c-c269031c8e62
+— what this is and why, in less time than this README (source: `landing.html`).
 
 > **Unofficial, community-maintained reference implementation**, linked from
 > Autopay's own documentation as a working example — not built, hosted, or
