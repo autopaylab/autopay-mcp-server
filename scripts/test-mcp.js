@@ -2,7 +2,9 @@
 // initialize, tools/list, then a build_test_itn -> verify_itn round trip
 // (including a tampered-hash case), plus one call per checkout flow. Run
 // `npm run dev` first.
-const BASE = `http://localhost:${process.env.PORT || 3002}/api/mcp`;
+// 127.0.0.1, not "localhost": on some environments "localhost" resolves
+// IPv6 (::1) first and fails fast if the stack isn't dual-homed there.
+const BASE = `http://127.0.0.1:${process.env.PORT || 3002}/api/mcp`;
 
 async function rpc(method, params, id) {
   const headers = {

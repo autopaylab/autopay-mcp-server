@@ -30,12 +30,18 @@ jobs:
       # step's process tree when it exits, nohup or not. Start, wait, and
       # run the round trip all in this single shell so the server stays up
       # for the whole thing.
+      # curl/node target 127.0.0.1 explicitly, not "localhost": on some
+      # runners "localhost" resolves IPv6 (::1) first, which fails fast and
+      # silently over and over if the stack isn't dual-homed there — that
+      # was the actual cause of this step timing out despite the server's
+      # own log proving it had started. --max-time keeps one hung request
+      # from silently eating the whole retry budget.
       - name: End-to-end MCP round trip against a local dev server
         run: |
           node scripts/dev-server.js > dev-server.log 2>&1 &
           ready=0
-          for i in $(seq 1 60); do
-            if curl -sf -X POST http://localhost:3002/api/mcp \
+          for i in $(seq 1 30); do
+            if curl -sf --max-time 2 -X POST http://127.0.0.1:3002/api/mcp \
               -H 'Content-Type: application/json' \
               -H 'Accept: application/json, text/event-stream' \
               -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' > /dev/null; then
