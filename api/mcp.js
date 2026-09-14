@@ -1,3 +1,12 @@
+// Node < 19 doesn't expose the Web Crypto API as globalThis.crypto, which
+// the MCP SDK relies on (see its README's "Node.js Web Crypto" section) —
+// without this, every request fails with "ReferenceError: crypto is not
+// defined". Polyfill from node:crypto's webcrypto before the SDK loads, so
+// this still works on Node 18 (this project's stated minimum).
+if (!globalThis.crypto) {
+  globalThis.crypto = require('node:crypto').webcrypto;
+}
+
 const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
 const { StreamableHTTPServerTransport } = require('@modelcontextprotocol/sdk/server/streamableHttp.js');
 const { registerCheckoutTools } = require('../lib/tools');

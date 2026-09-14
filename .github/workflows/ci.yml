@@ -30,43 +30,29 @@ jobs:
       # step's process tree when it exits, nohup or not. Start, wait, and
       # run the round trip all in this single shell so the server stays up
       # for the whole thing.
-      # DIAGNOSTIC PASS: two prior fixes (single-step, then 127.0.0.1
-      # instead of localhost) didn't resolve it — this step still fails
-      # every time on a full, unchanging retry budget, while dev-server.log
-      # only ever shows its startup line at the very end. Rather than guess
-      # a fourth blind fix, print exactly what's happening each attempt:
-      # is the process alive, is anything actually listening on :3002, and
-      # curl's real verbose error — so the next fix is based on evidence.
+      # Root cause found via the diagnostic version of this step (see git
+      # history): the server was up and answering the whole time, but with
+      # HTTP 400 "ReferenceError: crypto is not defined" on Node 18 — fixed
+      # in api/mcp.js / scripts/stdio.js with a globalThis.crypto polyfill.
+      # 127.0.0.1 (not "localhost") and single-step backgrounding are kept
+      # from earlier fixes as good practice, not because they were the bug.
       - name: End-to-end MCP round trip against a local dev server
         run: |
           node scripts/dev-server.js > dev-server.log 2>&1 &
-          SERVER_PID=$!
-          echo "started node, pid=$SERVER_PID"
           ready=0
-          for i in $(seq 1 10); do
-            sleep 1
-            echo "=== attempt $i ==="
-            echo "--- process alive? ---"
-            kill -0 "$SERVER_PID" 2>/dev/null && echo "yes" || echo "NO, process is gone"
-            echo "--- listening sockets ---"
-            (ss -tln 2>&1 || netstat -tln 2>&1 || echo "neither ss nor netstat available")
-            echo "--- dev-server.log so far ---"
-            cat dev-server.log || echo "(empty or unreadable)"
-            echo "--- curl -v ---"
-            curl -v --max-time 2 -X POST http://127.0.0.1:3002/api/mcp \
-              -H 'Content-Type: application/json' \
-              -H 'Accept: application/json, text/event-stream' \
-              -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' 2>&1 | tail -25
+          for i in $(seq 1 15); do
             if curl -sf --max-time 2 -X POST http://127.0.0.1:3002/api/mcp \
               -H 'Content-Type: application/json' \
               -H 'Accept: application/json, text/event-stream' \
-              -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' > /dev/null 2>&1; then
+              -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' > /dev/null; then
               ready=1
               break
             fi
+            sleep 1
           done
           if [ "$ready" -ne 1 ]; then
             echo "dev server never became ready" >&2
+            cat dev-server.log
             exit 1
           fi
           npm run test:mcp

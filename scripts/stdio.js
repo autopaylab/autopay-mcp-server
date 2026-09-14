@@ -2,6 +2,12 @@
 // clients that spawn a process directly (Claude Desktop, Claude Code)
 // instead of connecting over HTTP. The deployed/official entrypoint is
 // api/mcp.js (Streamable HTTP, see README).
+
+// See api/mcp.js for why this is needed on Node < 19.
+if (!globalThis.crypto) {
+  globalThis.crypto = require('node:crypto').webcrypto;
+}
+
 const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
 const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
 const { registerCheckoutTools } = require('../lib/tools');
