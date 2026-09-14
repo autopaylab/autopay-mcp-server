@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ["18.x", "22.x"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - run: npm ci
+
+      - name: Unit tests (lib/) — no network, no credentials
+        run: npm test
+
+      - name: Start local dev server
+        run: nohup npm run dev > dev-server.log 2>&1 &
+
+      - name: Wait for dev server
+        run: |
+          for i in $(seq 1 20); do
+            if curl -sf -X POST http://localhost:3002/api/mcp \
+              -H 'Content-Type: application/json' \
+              -H 'Accept: application/json, text/event-stream' \
+              -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' > /dev/null; then
+              exit 0
+            fi
+            sleep 0.5
+          done
+          echo "dev server never became ready" >&2
+          cat dev-server.log
+          exit 1
+
+      - name: End-to-end MCP round trip against the dev server
+        run: npm run test:mcp
+
+      - name: Show dev server log on failure
+        if: failure()
+        run: cat dev-server.log
