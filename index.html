@@ -5,7 +5,7 @@
 // legal/compliance obligation, not a visual pattern, so it is reused
 // unmodified rather than reimplemented. cmp_cdid "136af463a10ba" is tied to
 // Autopay's ConsentManager account/domain registration; valid to reuse on
-// autopaylab.com subdomains (this page: mcp-ap.autopaylab.com), not on an
+// autopaylab.com subdomains (this page: mcp.autopaylab.com), not on an
 // unrelated site. Must run before any other script that could set cookies.
 (function () {
   try {
@@ -454,11 +454,11 @@
   <section id="connect">
     <div class="eyebrow kicker">Connect a client</div>
     <h2>Point an MCP client at it</h2>
-    <p>Deployed at <code>mcp-ap.autopaylab.com</code> — clone the repo to run it locally instead, or read the full setup (Bearer token, WhiteLabel host, real credentials) in the README.</p>
+    <p>Deployed at <code>mcp.autopaylab.com</code> — clone the repo to run it locally instead, or read the full setup (Bearer token, WhiteLabel host, real credentials) in the README.</p>
     <div class="snippet">
       <div class="bar">Claude Code<button type="button" onclick="copyCode(this, 'cmd')">Copy</button></div>
       <pre id="cmd">claude mcp add --transport http autopay-checkout \
-  https://mcp-ap.autopaylab.com/api/mcp</pre>
+  https://mcp.autopaylab.com/api/mcp</pre>
     </div>
   </section>
 

@@ -15,10 +15,10 @@ verify its confirmation end to end, without a human touching any UI. Covers
   before starting the transaction (`payment`) on its own UI.
   Docs: https://autopay.gitbook.io/autopay-sdk/schemat-transakcji-whitelabel
 
-**Deploy:** `https://mcp-ap.autopaylab.com/api/mcp` (Bearer-token protected —
+**Deploy:** `https://mcp.autopaylab.com/api/mcp` (Bearer-token protected —
 see "Locking it down" below for how to get a token).
 
-**Landing page:** https://mcp-ap.autopaylab.com/ — what this is and why,
+**Landing page:** https://mcp.autopaylab.com/ — what this is and why,
 in less time than this README (source: `index.html`, served statically by
 the same Vercel deployment as `/api/mcp`).
 
