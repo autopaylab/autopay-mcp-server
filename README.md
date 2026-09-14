@@ -16,8 +16,9 @@ verify its confirmation end to end, without a human touching any UI. Covers
 **Deploy:** `https://mcp-ap.autopaylab.com/api/mcp` (Bearer-token protected —
 see "Locking it down" below for how to get a token).
 
-**Landing page:** https://claude.ai/code/artifact/16135f3d-b5a9-4f54-9d9c-c269031c8e62
-— what this is and why, in less time than this README (source: `landing.html`).
+**Landing page:** https://mcp-ap.autopaylab.com/ — what this is and why,
+in less time than this README (source: `index.html`, served statically by
+the same Vercel deployment as `/api/mcp`).
 
 > **Official Autopay MCP server — Open Beta.** Actively developed and open
 > to review and feedback: file issues, open PRs, or ask questions against
