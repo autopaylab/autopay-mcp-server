@@ -1,6 +1,7 @@
 const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
 const { StreamableHTTPServerTransport } = require('@modelcontextprotocol/sdk/server/streamableHttp.js');
 const { registerCheckoutTools } = require('../lib/tools');
+const config = require('../lib/config');
 
 function applyCors(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -18,12 +19,11 @@ function applyCors(req, res) {
 // settings to require every client to send
 // "Authorization: Bearer <token>".
 function checkAuth(req, res) {
-  const expected = process.env.MCP_ACCESS_TOKEN;
-  if (!expected) return true;
+  if (!config.accessToken) return true;
 
   const auth = req.headers['authorization'] || '';
   const [scheme, token] = auth.split(' ');
-  if (scheme === 'Bearer' && token === expected) return true;
+  if (scheme === 'Bearer' && token === config.accessToken) return true;
 
   res.setHeader('WWW-Authenticate', 'Bearer realm="autopay-mcp-server"');
   res.status(401).json({
@@ -37,12 +37,12 @@ function checkAuth(req, res) {
 // One fresh McpServer + transport per request, stateless (sessionIdGenerator
 // undefined) — the documented pattern for serverless: no session state to
 // keep alive between invocations of what may be different function
-// instances. See node_modules/@modelcontextprotocol/sdk .../streamableHttp.d.ts.
+// instances.
 module.exports = async (req, res) => {
   if (applyCors(req, res)) return;
   if (!checkAuth(req, res)) return;
 
-  const server = new McpServer({ name: 'autopay-checkout', version: '0.1.0' });
+  const server = new McpServer({ name: 'autopay-checkout', version: '0.2.0' });
   registerCheckoutTools(server);
 
   const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });

@@ -1,14 +1,23 @@
 {
   "name": "autopay-mcp-server",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "description": "MCP server exposing Autopay's Online v1.1 sandbox checkout as tools an AI agent can call directly",
+  "description": "MCP server exposing Autopay checkout (Online v1.1 + WhiteLabel) as tools an AI agent can call directly",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/autopaylab/autopay-mcp-server.git"
+  },
   "scripts": {
     "dev": "node scripts/dev-server.js",
-    "test:mcp": "node scripts/test-mcp.js"
+    "test:mcp": "node scripts/test-mcp.js",
+    "start:stdio": "node scripts/stdio.js"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
-    "zod": "^4.5.4"
+    "zod": "^3.25.0"
   }
 }
