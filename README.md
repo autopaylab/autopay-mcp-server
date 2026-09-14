@@ -1,5 +1,7 @@
 # Autopay MCP server
 
+[![CI](https://github.com/autopaylab/autopay-mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/autopaylab/autopay-mcp-server/actions/workflows/ci.yml)
+
 Exposes Autopay checkout as [MCP](https://modelcontextprotocol.io) tools —
 any MCP-compatible agent can list payment channels, start a payment, and
 verify its confirmation end to end, without a human touching any UI. Covers
@@ -110,6 +112,7 @@ set** (regional PSPs), not inventing something nobody else has.
 ```bash
 npm install
 cp .env.example .env    # optional — defaults work for exploring the flow
+npm test                 # unit tests (lib/) — no network, no credentials needed
 npm run dev              # http://localhost:3002/api/mcp (and /api/itn)
 npm run test:mcp         # in another terminal — full initialize -> tools/list
                           # -> list_test_scenarios -> checkout tools ->
@@ -118,6 +121,11 @@ npm run start:stdio       # optional: run over stdio instead, for MCP clients
                           # that spawn a process directly (Claude Desktop,
                           # Claude Code) rather than connecting over HTTP
 ```
+
+Both `npm test` and `npm run test:mcp` run in CI on every push/PR to `main`
+(`.github/workflows/ci.yml`). See [CONTRIBUTING.md](./CONTRIBUTING.md) before
+opening a pull request, and [SECURITY.md](./SECURITY.md) to report a
+vulnerability privately instead of via a public issue.
 
 ## Connecting a real MCP client
 
@@ -190,6 +198,7 @@ lib/config.js             — env-driven credentials/config (mock defaults)
 scripts/dev-server.js     — local runner for api/*.js
 scripts/test-mcp.js       — end-to-end test against the running dev server
 scripts/stdio.js          — optional stdio entrypoint for local MCP clients
+test/                      — unit tests (npm test), one file per lib/ module
 ```
 
 ## Related repos
