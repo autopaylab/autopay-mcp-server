@@ -30,29 +30,43 @@ jobs:
       # step's process tree when it exits, nohup or not. Start, wait, and
       # run the round trip all in this single shell so the server stays up
       # for the whole thing.
-      # curl/node target 127.0.0.1 explicitly, not "localhost": on some
-      # runners "localhost" resolves IPv6 (::1) first, which fails fast and
-      # silently over and over if the stack isn't dual-homed there — that
-      # was the actual cause of this step timing out despite the server's
-      # own log proving it had started. --max-time keeps one hung request
-      # from silently eating the whole retry budget.
+      # DIAGNOSTIC PASS: two prior fixes (single-step, then 127.0.0.1
+      # instead of localhost) didn't resolve it — this step still fails
+      # every time on a full, unchanging retry budget, while dev-server.log
+      # only ever shows its startup line at the very end. Rather than guess
+      # a fourth blind fix, print exactly what's happening each attempt:
+      # is the process alive, is anything actually listening on :3002, and
+      # curl's real verbose error — so the next fix is based on evidence.
       - name: End-to-end MCP round trip against a local dev server
         run: |
           node scripts/dev-server.js > dev-server.log 2>&1 &
+          SERVER_PID=$!
+          echo "started node, pid=$SERVER_PID"
           ready=0
-          for i in $(seq 1 30); do
+          for i in $(seq 1 10); do
+            sleep 1
+            echo "=== attempt $i ==="
+            echo "--- process alive? ---"
+            kill -0 "$SERVER_PID" 2>/dev/null && echo "yes" || echo "NO, process is gone"
+            echo "--- listening sockets ---"
+            (ss -tln 2>&1 || netstat -tln 2>&1 || echo "neither ss nor netstat available")
+            echo "--- dev-server.log so far ---"
+            cat dev-server.log || echo "(empty or unreadable)"
+            echo "--- curl -v ---"
+            curl -v --max-time 2 -X POST http://127.0.0.1:3002/api/mcp \
+              -H 'Content-Type: application/json' \
+              -H 'Accept: application/json, text/event-stream' \
+              -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' 2>&1 | tail -25
             if curl -sf --max-time 2 -X POST http://127.0.0.1:3002/api/mcp \
               -H 'Content-Type: application/json' \
               -H 'Accept: application/json, text/event-stream' \
-              -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' > /dev/null; then
+              -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' > /dev/null 2>&1; then
               ready=1
               break
             fi
-            sleep 1
           done
           if [ "$ready" -ne 1 ]; then
             echo "dev server never became ready" >&2
-            cat dev-server.log
             exit 1
           fi
           npm run test:mcp
