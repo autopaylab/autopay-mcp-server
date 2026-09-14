@@ -328,11 +328,30 @@
     max-width: 68ch;
   }
   .disclaimer strong { color: var(--ink); }
+  .disclaimer.beta { background: var(--warn-bg); }
+  .disclaimer.beta strong { color: var(--warn-ink); }
+
+  /* ---------- Status badges (hero) ---------- */
+  .badge-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .badge-beta {
+    display: inline-flex; align-items: center;
+    border-radius: 999px;
+    background: var(--warn-bg);
+    color: var(--warn-ink);
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
 </style>
 
 <div class="wrap">
 
-  <div class="eyebrow">autopaylab · autopay&#8209;mcp&#8209;server</div>
+  <div class="badge-row">
+    <div class="eyebrow">autopaylab · autopay&#8209;mcp&#8209;server</div>
+    <div class="badge-beta">Open Beta</div>
+  </div>
 
   <div class="hero">
     <h1>Autopay checkout, exposed as tools an <span class="accent">AI agent</span> can call directly.</h1>
@@ -446,11 +465,10 @@
     </div>
   </section>
 
-  <div class="disclaimer">
-    <strong>Unofficial, community-maintained reference implementation.</strong>
-    Linked from Autopay's documentation as a working example — not built,
-    hosted, or supported by Autopay S.A. itself. File issues against the
-    repository, not Autopay's support channels.
+  <div class="disclaimer beta">
+    <strong>Official Autopay MCP server — Open Beta.</strong>
+    Actively developed and open to review: found something wrong, missing,
+    or worth discussing? File an issue or open a PR against the repository.
   </div>
 
   <footer class="page">

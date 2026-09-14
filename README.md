@@ -19,10 +19,9 @@ see "Locking it down" below for how to get a token).
 **Landing page:** https://claude.ai/code/artifact/16135f3d-b5a9-4f54-9d9c-c269031c8e62
 — what this is and why, in less time than this README (source: `landing.html`).
 
-> **Unofficial, community-maintained reference implementation**, linked from
-> Autopay's own documentation as a working example — not built, hosted, or
-> supported by Autopay S.A. itself. Report issues against this repo, not
-> Autopay's support channels.
+> **Official Autopay MCP server — Open Beta.** Actively developed and open
+> to review and feedback: file issues, open PRs, or ask questions against
+> this repository.
 
 ## Status: mock credentials, real hash math
 
